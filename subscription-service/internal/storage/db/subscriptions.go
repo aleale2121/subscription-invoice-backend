@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-
 type SubscriptionPersistence struct {
 	db *sql.DB
 }
