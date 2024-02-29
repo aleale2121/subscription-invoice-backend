@@ -1,0 +1,210 @@
+{
+	"info": {
+		"_postman_id": "5073d6f2-8be6-4d74-9a08-5749938ad79e",
+		"name": "subscription-backend",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9598407"
+	},
+	"item": [
+		{
+			"name": "create-plan",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Name\":\"Yearly 3\",\n    \"Duration\" : 12,\n    \"DurationUnits\" : \"MONTHS\",\n    \"BillingFrequency\" : 3,\n    \"BillingFrequencyUnits\" : \"MONTHS\",\n    \"Price\" : 99.00,\n    \"Currency\" : \"EUR\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/plans",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"plans"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all plans",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/plans",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"plans"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get-plan by id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/plans/1",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"plans",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "signup",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Email\":\"alefewyimer4@gmail.com\",\n    \"Password\":\"123456\",\n    \"FirstName\":\"Alefew 4\",\n    \"LastName\":\"Yimer\",\n    \"PlanID\":1,\n    \"ContractStartDate\":\"2024-02-29\",\n    \"ProductCode\":\"ProductCode\",\n    \"Address\": {\n        \"address\":\"1 address 1\",\n        \"address_2\":\"1 address_2\",\n        \"postal_code\":\"1000\",\n        \"city\":\"addis ababa\",\n        \"country\":\"Ethiopia\"\n    }\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/signup",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"signup"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get user subscription",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/users/1/subscriptions",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"1",
+						"subscriptions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all subscriptions",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/users/subscriptions",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"subscriptions"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get subscriptions billed today",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/users/subscriptions/todays",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"users",
+						"subscriptions",
+						"todays"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"userId\": 1,\n    \"id\": 1,\n    \"title\": \"delectus aut autem\",\n    \"completed\": false\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://jsonplaceholder.typicode.com/todos/",
+					"protocol": "https",
+					"host": [
+						"jsonplaceholder",
+						"typicode",
+						"com"
+					],
+					"path": [
+						"todos",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8081",
+			"type": "string"
+		}
+	]
+}
