@@ -4,12 +4,12 @@ WORKDIR /app
 COPY go.mod go.sum ./ 
 RUN go mod download
 COPY . .
-RUN  CGO_ENABLED=0 go build -o userApp ./cmd/api/ 
+RUN  CGO_ENABLED=0 go build -o app ./cmd/api/ 
 
 # Run stage
 FROM alpine:3.16
 WORKDIR /app
-COPY --from=builder /app/userApp .
+COPY --from=builder /app/app .
 COPY assets /assets
 COPY temp /temp
-CMD [ "/app/userApp" ]
+CMD [ "/app/app" ]
