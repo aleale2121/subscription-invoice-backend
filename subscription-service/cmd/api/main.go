@@ -56,6 +56,7 @@ func main() {
 	userPersistence := db.NewUsersPersistence(conn)
 	subcPersistence := db.NewSubscriptionsPersistence(conn)
 	planPersistence := db.NewPlansPersistence(conn)
+	invoicePersistence := db.NewInvoicePersistence(conn)
 
 	authHandler := handlers.NewAuthHandler(userPersistence, planPersistence, subcPersistence, rabbitConn)
 	subcHandler := handlers.NewSubscriptionHandler(subcPersistence, rabbitConn)
@@ -87,7 +88,7 @@ func main() {
 
 	wait := make(chan bool)
 	cronJobRunner := cron.New()
-	schedulerService := scheduler.NewSchedulerService(cronJobRunner, rabbitConn, subcPersistence, planPersistence, userPersistence, invoiceGenerator, mail)
+	schedulerService := scheduler.NewSchedulerService(cronJobRunner, rabbitConn, subcPersistence, planPersistence, userPersistence, invoicePersistence, invoiceGenerator, mail)
 	go schedulerService.Schedules(wait)
 
 	// create consumer
