@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 	"subscription-service/internal/constants/models"
+	"subscription-service/internal/constants/states"
 )
 
 type InvoicePersistence struct {
@@ -47,9 +48,9 @@ func (p *InvoicePersistence) UpdateInvoice(invoiceID string, newEmailRetry int) 
 	return nil
 }
 
-// GetAllInvoices returns all invoice records from the database
-func (p *InvoicePersistence) GetAllInvoices() ([]models.FailedInvoice, error) {
-	rows, err := p.db.Query("SELECT id, subscription_id, invoice_id, invoice_date, email_retry FROM failed_invoices")
+// GetAllFailedInvoices returns all invoice records from the database
+func (p *InvoicePersistence) GetAllFailedInvoices() ([]models.FailedInvoice, error) {
+	rows, err := p.db.Query("SELECT id, subscription_id, invoice_id, invoice_date, email_retry FROM failed_invoices WHERE email_retry < $1", states.MAX_EMAIL_RETRY)
 	if err != nil {
 		log.Println("Error querying invoices:", err)
 		return nil, err

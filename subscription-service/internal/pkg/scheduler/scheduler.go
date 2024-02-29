@@ -47,21 +47,22 @@ func NewSchedulerService(cron *cron.Cron, Rabbit *amqp.Connection,
 }
 
 func (s *SchedulerService) Schedules(wait chan bool) {
-	_, err := s.cron.AddFunc("@daily", s.ProcessInvoices)
+	_, err := s.cron.AddFunc("@daily", s.SendInvoices)
 	if err != nil {
 		log.Printf("Error: scheduling daily invoice processing %v", err.Error())
 		return
 	}
-	_, err = s.cron.AddFunc("@daily", s.ProcessFailedInvoices)
+	_, err = s.cron.AddFunc("@daily", s.ReSendFailedInvoices)
 	if err != nil {
 		log.Printf("Error: scheduling failed invoice processing %v", err.Error())
 		return
 	}
+	log.Println("************** Crone Job Started *****************")
 	s.cron.Run()
 }
 
-func (s *SchedulerService) ProcessInvoices() {
-	log.Println("Invoice Processing Started")
+func (s *SchedulerService) SendInvoices() {
+	log.Println("Resending Invoice Started")
 	subscriptions, err := s.subscriptionPersistence.GetSubscriptionsToBillToday()
 	if err != nil {
 		log.Printf("Error: fetching subscription %v", err.Error())
@@ -107,10 +108,10 @@ func (s *SchedulerService) ProcessInvoices() {
 	}
 }
 
-func (s *SchedulerService) ProcessFailedInvoices() {
-	log.Println("Failed Invoice Processing Started")
+func (s *SchedulerService) ReSendFailedInvoices() {
+	log.Println("Resending Unsent Invoices Started")
 
-	failedInvoices, err := s.invoicePersistence.GetAllInvoices()
+	failedInvoices, err := s.invoicePersistence.GetAllFailedInvoices()
 	if err != nil {
 		log.Printf("Error: fetching failed invoices %v", err.Error())
 		return

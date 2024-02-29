@@ -144,13 +144,16 @@ func (app *AuthHandler) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	subs.ID = subsID
-
-	app.pushToQueue("invoice", models.InvoicePayload{
-		User:           usr,
-		BillingAddress: addr,
-		Subscription:   subs,
-		Plan:           *plan,
-	})
+	now, _ := time.Parse(states.TIME_LAYOUT, time.Now().Format(states.TIME_LAYOUT))
+	
+	if now.Equal(contractStartDate) {
+		app.pushToQueue("invoice", models.InvoicePayload{
+			User:           usr,
+			BillingAddress: addr,
+			Subscription:   subs,
+			Plan:           *plan,
+		})
+	}
 
 	payload := jsonResponse{
 		Error:   false,
