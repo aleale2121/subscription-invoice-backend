@@ -5,6 +5,7 @@ import (
 	"log"
 	"subscription-service/internal/constants/models"
 	"subscription-service/internal/constants/states"
+	"subscription-service/internal/pkg/httpclient"
 	ig "subscription-service/internal/pkg/invoicegenerator"
 	"subscription-service/internal/pkg/mailer"
 	"subscription-service/internal/storage/db"
@@ -60,6 +61,7 @@ func (s *SchedulerService) Schedules(wait chan bool) {
 }
 
 func (s *SchedulerService) ProcessInvoices() {
+	log.Println("Invoice Processing Started")
 	subscriptions, err := s.subscriptionPersistence.GetSubscriptionsToBillToday()
 	if err != nil {
 		log.Printf("Error: fetching subscription %v", err.Error())
@@ -99,11 +101,15 @@ func (s *SchedulerService) ProcessInvoices() {
 				})
 				return
 			}
+			httpclient.PostInvoiceToAccountingService(invoiceID)
+
 		}(subscription)
 	}
 }
 
 func (s *SchedulerService) ProcessFailedInvoices() {
+	log.Println("Failed Invoice Processing Started")
+
 	failedInvoices, err := s.invoicePersistence.GetAllInvoices()
 	if err != nil {
 		log.Printf("Error: fetching failed invoices %v", err.Error())
@@ -144,6 +150,7 @@ func (s *SchedulerService) ProcessFailedInvoices() {
 				return
 			} else {
 				s.invoicePersistence.DeleteInvoice(invoiceID)
+				httpclient.PostInvoiceToAccountingService(invoiceID)
 			}
 		}(invoice)
 	}
