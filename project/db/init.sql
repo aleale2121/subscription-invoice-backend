@@ -12,6 +12,20 @@ CREATE TABLE users
 );
 
 
+-- Billing Address Table
+CREATE TABLE billing_address
+(
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    address VARCHAR(100) NOT NULL,
+    address_2 VARCHAR(100),
+    postal_code VARCHAR(10),
+    city VARCHAR(25),
+    country VARCHAR(25),
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+
 -- Plan table
 CREATE TABLE plans
 (
@@ -49,3 +63,15 @@ CREATE TABLE subscriptions
     UNIQUE (user_id, plan_id, product_code)
 );
 
+
+--Failed Invoices table
+CREATE TABLE failed_invoices
+(
+    id SERIAL PRIMARY KEY,
+    subscription_id INT NOT NULL,
+    invoice_id VARCHAR(25) NOT NULL,
+    invoice_date TIMESTAMP NOT NULL,
+    email_retry INT NOT NULL,
+    FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)
+
+);

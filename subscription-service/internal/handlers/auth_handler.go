@@ -145,7 +145,7 @@ func (app *AuthHandler) SignUpHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	subs.ID = subsID
 
-	app.pushToQueue("invoice", models.SendInvoiceEventPayload{
+	app.pushToQueue("invoice", models.InvoicePayload{
 		User:           usr,
 		BillingAddress: addr,
 		Subscription:   subs,

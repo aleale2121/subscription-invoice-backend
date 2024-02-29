@@ -70,11 +70,6 @@ func main() {
 	routesList = append(routesList, subcRouring...)
 	routesList = append(routesList, planRouting...)
 
-	wait := make(chan bool)
-	cronJobRunner := cron.New()
-	schedulerService := scheduler.NewSchedulerService(cronJobRunner, rabbitConn)
-	go schedulerService.Schedules(wait)
-
 	companyAddress := models.Address{
 		Address:    "Steinstraße 2",
 		Address2:   "Düsseldorf",
@@ -89,10 +84,15 @@ func main() {
 		companyAddress)
 
 	mail := createMail()
+
+	wait := make(chan bool)
+	cronJobRunner := cron.New()
+	schedulerService := scheduler.NewSchedulerService(cronJobRunner, rabbitConn, subcPersistence, planPersistence, userPersistence, invoiceGenerator, mail)
+	go schedulerService.Schedules(wait)
+
 	// create consumer
 	consumer, err := event.NewConsumer(rabbitConn, invoiceGenerator, mail)
 	if err != nil {
-		// start listening for messages
 		log.Println("Listening for and consuming RabbitMQ messages...")
 		panic(err)
 	}

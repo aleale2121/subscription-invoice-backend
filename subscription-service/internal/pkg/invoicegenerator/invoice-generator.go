@@ -51,7 +51,7 @@ func (ig InvoiceGenerator) Generate(invoice models.Invoice) (string, error) {
 	doc.SetDate(invoice.Date)
 	doc.SetPaymentTerm(invoice.PaymentTerm)
 
-	logoBytes, err := os.ReadFile("./Movido_Logo.png")
+	logoBytes, err := os.ReadFile("../../../assets/logo/Movido_Logo.png")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -96,7 +96,7 @@ func (ig InvoiceGenerator) Generate(invoice models.Invoice) (string, error) {
 	}
 
 	id := uuid.NewV4().String()
-	err = pdf.OutputFileAndClose(fmt.Sprintf("../../temp/%s.pdf", id))
+	err = pdf.OutputFileAndClose(fmt.Sprintf("../../../temp/%s.pdf", id))
 	if err != nil {
 		log.Println(err)
 		return "", err

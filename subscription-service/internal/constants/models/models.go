@@ -80,7 +80,16 @@ type Subscription struct {
 	UpdatedAt             time.Time `json:"UpdatedAt"`
 }
 
-type SendInvoiceEventPayload struct {
+// FailedInvoice is the structure which holds one failed invoice data.
+type FailedInvoice struct {
+	ID             int       `json:"ID"`
+	SubscriptionID int       `json:"SubscriptionID"`
+	InvoiceID      string    `json:"InvoiceID"`
+	InvoiceDate    time.Time `json:"InvoiceDate"`
+	EmailRetry     int       `json:"EmailRetry"`
+}
+
+type InvoicePayload struct {
 	User           User         `json:"User"`
 	BillingAddress Address      `json:"BillingAddress"`
 	Subscription   Subscription `json:"Subscription"`

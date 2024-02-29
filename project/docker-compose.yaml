@@ -58,5 +58,13 @@ services:
       replicas: 1
     environment:
       DSN: "host=postgres port=5432 user=postgres password=password dbname=subscription_backend sslmode=disable timezone=UTC connect_timeout=5"
+      MAIL_DOMAIN: localhost
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_ENCRYPTION: none
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      FROM_NAME: "Movido Verlag"
+      FROM_ADDRESS: alefewyimer2@gmail.com
       
       

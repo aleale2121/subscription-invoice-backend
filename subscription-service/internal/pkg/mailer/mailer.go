@@ -32,6 +32,7 @@ type Message struct {
 }
 
 func (m *Mail) SendSMTPMessage(msg Message) error {
+	log.Printf("Start sending email %+v", msg)
 	if msg.From == "" {
 		msg.From = m.FromAddress
 	}
@@ -48,11 +49,13 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 
 	formattedMessage, err := m.buildHTMLMessage(msg)
 	if err != nil {
+		log.Printf("Error: formatting html %+v", err)
 		return err
 	}
 
 	plainMessage, err := m.buildPlainTextMessage(msg)
 	if err != nil {
+		log.Printf("Error: formatting plain %+v", err)
 		return err
 	}
 
@@ -68,6 +71,7 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 
 	smtpClient, err := server.Connect()
 	if err != nil {
+		log.Println("Email: error connecting to the server")
 		log.Println(err)
 		return err
 	}
@@ -88,15 +92,15 @@ func (m *Mail) SendSMTPMessage(msg Message) error {
 
 	err = email.Send(smtpClient)
 	if err != nil {
-		log.Println(err)
+		log.Println("Email: error sending email")
 		return err
 	}
-
+	log.Println("Email SENT")
 	return nil
 }
 
 func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
-	templateToRender := "./templates/mail.html.gohtml"
+	templateToRender := "../../../assets/templates/mail.html.gohtml"
 
 	t, err := template.New("email-html").ParseFiles(templateToRender)
 	if err != nil {
@@ -118,7 +122,7 @@ func (m *Mail) buildHTMLMessage(msg Message) (string, error) {
 }
 
 func (m *Mail) buildPlainTextMessage(msg Message) (string, error) {
-	templateToRender := "./templates/mail.plain.gohtml"
+	templateToRender := "../../../assets/templates/mail.plain.gohtml"
 
 	t, err := template.New("email-plain").ParseFiles(templateToRender)
 	if err != nil {

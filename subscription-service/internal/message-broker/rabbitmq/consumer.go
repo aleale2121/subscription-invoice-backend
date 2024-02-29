@@ -164,8 +164,8 @@ func sendInvoice(payload Payload, invoicegenerator ig.InvoiceGenerator, mail mai
 	var invoicePld InvoicePayload
 	j, err := json.Marshal(payload.Data)
 	if err != nil {
-		fmt.Println("Error: marshal")
-		fmt.Println(err)
+		log.Println("Error: marshal")
+		log.Println(err)
 		return
 	}
 	err = json.Unmarshal(j, &invoicePld)
@@ -203,24 +203,24 @@ func sendInvoice(payload Payload, invoicegenerator ig.InvoiceGenerator, mail mai
 	}
 	invoiceID, err := invoicegenerator.Generate(invoice)
 	if err != nil {
-		fmt.Println("Error: generate invoice")
-		fmt.Println(err)
+		log.Println("Error: generate invoice")
+		log.Println(err)
 		return
 	}
 
 	// Send Email
 	invoicePDF := fmt.Sprintf("../../../temp/%s.pdf", invoiceID)
+	log.Printf("Mail: %+v", mail)
+
 	err = mail.SendSMTPMessage(mailer.Message{
-		From:        mail.FromAddress,
-		FromName:    mail.FromName,
 		To:          invoicePld.User.Email,
-		Subject:     "Invoice For Movido SUbscription",
+		Subject:     "Invoice For Movido Subscription",
 		Attachments: []string{invoicePDF},
-		Data:        nil,
-		DataMap:     map[string]any{},
+		Data:        "Invoice",
+		DataMap:     map[string]any{"inv": "Invoice"},
 	})
 	if err != nil {
-		fmt.Println("Error: sending main")
-		fmt.Println(err)
+		log.Println("Error: sending main")
+		log.Println(err)
 	}
 }
