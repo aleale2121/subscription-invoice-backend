@@ -4,10 +4,11 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+
 	"github.com/go-chi/chi/v5"
 
+	"subscription-service/internal/constants/models"
 	"subscription-service/internal/storage/db"
-
 )
 
 type PlanHandler struct {
@@ -78,7 +79,7 @@ func (h *PlanHandler) CreatePlan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	planID, err := h.PlanPersistence.InsertPlan(db.Plan{
+	planID, err := h.PlanPersistence.InsertPlan(models.Plan{
 		Name:                  requestPayload.Name,
 		Duration:              requestPayload.Duration,
 		DurationUnits:         requestPayload.DurationUnits,
@@ -117,7 +118,7 @@ func (h *PlanHandler) UpdatePlan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.PlanPersistence.UpdatePlan(db.Plan{
+	if err := h.PlanPersistence.UpdatePlan(models.Plan{
 		ID:                    planID,
 		Name:                  requestPayload.Name,
 		Duration:              requestPayload.Duration,

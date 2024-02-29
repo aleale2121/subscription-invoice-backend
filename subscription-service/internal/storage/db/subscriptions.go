@@ -4,28 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"subscription-service/internal/constants/models"
 	"time"
 )
 
-// Subscription is the structure which holds one subscription from the database.
-type Subscription struct {
-	ID                    int       `json:"ID"`
-	UserID                int       `json:"UserID"`
-	PlanID                int       `json:"PlanID"`
-	ContractStartDate     time.Time `json:"ContractStartDate"`
-	Duration              int32     `json:"Duration"`
-	DurationUnits         string    `json:"DurationUnits"`
-	BillingFrequency      int32     `json:"BillingFrequency"`
-	BillingFrequencyUnits string    `json:"BillingFrequencyUnits"`
-	Price                 float32   `json:"Price"`
-	Currency              string    `json:"Currency"`
-	ProductCode           string    `json:"ProductCode"`
-	Status                string    `json:"Status"`
-	BilledCycles          int       `json:"BilledCycles"`
-	NextBillingDate       time.Time `json:"NextBillingDate"`
-	CreatedAt             time.Time `json:"CreatedAt"`
-	UpdatedAt             time.Time `json:"UpdatedAt"`
-}
 
 type SubscriptionPersistence struct {
 	db *sql.DB
@@ -37,7 +19,7 @@ func NewSubscriptionsPersistence(dbPool *sql.DB) SubscriptionPersistence {
 }
 
 // GetAll returns a slice of all subscriptions, sorted by ID
-func (s *SubscriptionPersistence) GetAll() ([]*Subscription, error) {
+func (s *SubscriptionPersistence) GetAll() ([]*models.Subscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -49,10 +31,10 @@ func (s *SubscriptionPersistence) GetAll() ([]*Subscription, error) {
 	}
 	defer rows.Close()
 
-	var subscriptions []*Subscription
+	var subscriptions []*models.Subscription
 
 	for rows.Next() {
-		var subscription Subscription
+		var subscription models.Subscription
 		err := rows.Scan(
 			&subscription.ID,
 			&subscription.UserID,
@@ -83,13 +65,13 @@ func (s *SubscriptionPersistence) GetAll() ([]*Subscription, error) {
 }
 
 // GetByUserID returns one subscription by UserID
-func (s *SubscriptionPersistence) GetByUserID(userID int) (*Subscription, error) {
+func (s *SubscriptionPersistence) GetByUserID(userID int) (*models.Subscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
 	query := `SELECT * FROM subscriptions WHERE user_id = $1`
 
-	var subscription Subscription
+	var subscription models.Subscription
 	row := s.db.QueryRowContext(ctx, query, userID)
 
 	err := row.Scan(
@@ -119,13 +101,13 @@ func (s *SubscriptionPersistence) GetByUserID(userID int) (*Subscription, error)
 }
 
 // GetOne returns one subscription by ID
-func (s *SubscriptionPersistence) GetOne(id int) (*Subscription, error) {
+func (s *SubscriptionPersistence) GetOne(id int) (*models.Subscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
 	query := `SELECT * FROM subscriptions WHERE id = $1`
 
-	var subscription Subscription
+	var subscription models.Subscription
 	row := s.db.QueryRowContext(ctx, query, id)
 
 	err := row.Scan(
@@ -155,7 +137,7 @@ func (s *SubscriptionPersistence) GetOne(id int) (*Subscription, error) {
 }
 
 // Update updates one subscription in the database, using the information stored in the receiver sub
-func (s *SubscriptionPersistence) Update(subscription Subscription) error {
+func (s *SubscriptionPersistence) Update(subscription models.Subscription) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -216,8 +198,8 @@ func (s *SubscriptionPersistence) Delete(id int) error {
 	return nil
 }
 
-// Insert inserts a new subscription into the database, and returns the ID of the newly inserted row
-func (s *SubscriptionPersistence) Insert(subscription Subscription) (int, error) {
+// AddSubscription inserts a new subscription into the database, and returns the ID of the newly inserted row
+func (s *SubscriptionPersistence) AddSubscription(subscription models.Subscription) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -251,7 +233,7 @@ func (s *SubscriptionPersistence) Insert(subscription Subscription) (int, error)
 }
 
 // GetSubscriptionsToBillToday returns subscriptions to be billed today.
-func (s *SubscriptionPersistence) GetSubscriptionsToBillToday() ([]*Subscription, error) {
+func (s *SubscriptionPersistence) GetSubscriptionsToBillToday() ([]*models.Subscription, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -268,10 +250,10 @@ func (s *SubscriptionPersistence) GetSubscriptionsToBillToday() ([]*Subscription
 	}
 	defer rows.Close()
 
-	var subscriptions []*Subscription
+	var subscriptions []*models.Subscription
 
 	for rows.Next() {
-		var subscription Subscription
+		var subscription models.Subscription
 		if err := rows.Scan(&subscription.ID,
 			&subscription.UserID,
 			&subscription.PlanID,

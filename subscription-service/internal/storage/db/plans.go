@@ -4,18 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"log"
+	"subscription-service/internal/constants/models"
 )
-
-type Plan struct {
-	ID                    int     `json:"ID"`
-	Name                  string  `json:"Name"`
-	Duration              int32   `json:"Duration"`
-	DurationUnits         string  `json:"DurationUnits"`
-	BillingFrequency      int32   `json:"BillingFrequency"`
-	BillingFrequencyUnits string  `json:"BillingFrequencyUnits"`
-	Price                 float32 `json:"Price"`
-	Currency              string  `json:"Currency"`
-}
 
 type PlanPersistence struct {
 	db *sql.DB
@@ -27,7 +17,7 @@ func NewPlansPersistence(dbPool *sql.DB) PlanPersistence {
 }
 
 // GetAllPlans returns all plans from the database
-func (p *PlanPersistence) GetAllPlans() ([]*Plan, error) {
+func (p *PlanPersistence) GetAllPlans() ([]*models.Plan, error) {
 	rows, err := p.db.Query("SELECT id, name, duration, duration_units, billing_frequency, billing_frequency_units, price, currency FROM plans")
 	if err != nil {
 		log.Println("Error querying plans:", err)
@@ -35,9 +25,9 @@ func (p *PlanPersistence) GetAllPlans() ([]*Plan, error) {
 	}
 	defer rows.Close()
 
-	var plans []*Plan
+	var plans []*models.Plan
 	for rows.Next() {
-		var plan Plan
+		var plan models.Plan
 		if err := rows.Scan(&plan.ID, &plan.Name, &plan.Duration, &plan.DurationUnits, &plan.BillingFrequency, &plan.BillingFrequencyUnits, &plan.Price, &plan.Currency); err != nil {
 			log.Println("Error scanning plan row:", err)
 			return nil, err
@@ -54,8 +44,8 @@ func (p *PlanPersistence) GetAllPlans() ([]*Plan, error) {
 }
 
 // GetPlanByID returns a plan from the database by ID
-func (p *PlanPersistence) GetPlanByID(id int) (*Plan, error) {
-	var plan Plan
+func (p *PlanPersistence) GetPlanByID(id int) (*models.Plan, error) {
+	var plan models.Plan
 	err := p.db.QueryRow("SELECT id, name, duration, duration_units, billing_frequency, billing_frequency_units, price, currency FROM plans WHERE id = $1", id).
 		Scan(&plan.ID, &plan.Name, &plan.Duration, &plan.DurationUnits, &plan.BillingFrequency, &plan.BillingFrequencyUnits, &plan.Price, &plan.Currency)
 	if err != nil {
@@ -66,7 +56,7 @@ func (p *PlanPersistence) GetPlanByID(id int) (*Plan, error) {
 }
 
 // UpdatePlan updates a plan in the database
-func (p *PlanPersistence) UpdatePlan(plan Plan) error {
+func (p *PlanPersistence) UpdatePlan(plan models.Plan) error {
 	_, err := p.db.Exec("UPDATE plans SET name = $1, duration = $2, duration_units = $3, billing_frequency = $4, billing_frequency_units = $5, price = $6, currency = $7 WHERE id = $8",
 		plan.Name, plan.Duration, plan.DurationUnits, plan.BillingFrequency, plan.BillingFrequencyUnits, plan.Price, plan.Currency, plan.ID)
 	if err != nil {
@@ -87,7 +77,7 @@ func (p *PlanPersistence) DeletePlan(id int) error {
 }
 
 // InsertPlan inserts a new plan into the database
-func (p *PlanPersistence) InsertPlan(plan Plan) (int, error) {
+func (p *PlanPersistence) InsertPlan(plan models.Plan) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 

@@ -3,24 +3,12 @@ package db
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"log"
+	"subscription-service/internal/constants/models"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
-
-// User is the structure which holds one user from the database.
-type User struct {
-	ID        int       `json:"id"`
-	Email     string    `json:"email"`
-	FirstName string    `json:"first_name,omitempty"`
-	LastName  string    `json:"last_name,omitempty"`
-	Password  string    `json:"-"`
-	Active    int       `json:"active"`
-	CreatedAt time.Time `json:"created_at"`
-	UpdatedAt time.Time `json:"updated_at"`
-}
 
 type UserPersistence struct {
 	db *sql.DB
@@ -32,7 +20,7 @@ func NewUsersPersistence(dbPool *sql.DB) UserPersistence {
 }
 
 // GetAll returns a slice of all users, sorted by last name
-func (u *UserPersistence) GetAll() ([]*User, error) {
+func (u *UserPersistence) GetAll() ([]*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -45,10 +33,10 @@ func (u *UserPersistence) GetAll() ([]*User, error) {
 	}
 	defer rows.Close()
 
-	var users []*User
+	var users []*models.User
 
 	for rows.Next() {
-		var user User
+		var user models.User
 		err := rows.Scan(
 			&user.ID,
 			&user.Email,
@@ -71,13 +59,13 @@ func (u *UserPersistence) GetAll() ([]*User, error) {
 }
 
 // GetByEmail returns one user by email
-func (u *UserPersistence) GetByEmail(email string) (*User, error) {
+func (u *UserPersistence) GetByEmail(email string) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
 	query := `select id, email, first_name, last_name, password, active, created_at, updated_at from users where email = $1`
 
-	var user User
+	var user models.User
 	row := u.db.QueryRowContext(ctx, query, email)
 
 	err := row.Scan(
@@ -99,13 +87,13 @@ func (u *UserPersistence) GetByEmail(email string) (*User, error) {
 }
 
 // GetOne returns one user by id
-func (u *UserPersistence) GetOne(id int) (*User, error) {
+func (u *UserPersistence) GetOne(id int) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
 	query := `select id, email, first_name, last_name, password, active, created_at, updated_at from users where id = $1`
 
-	var user User
+	var user models.User
 	row := u.db.QueryRowContext(ctx, query, id)
 
 	err := row.Scan(
@@ -128,7 +116,7 @@ func (u *UserPersistence) GetOne(id int) (*User, error) {
 
 // Update updates one user in the database, using the information
 // stored in the receiver u
-func (u *UserPersistence) Update(user User) error {
+func (u *UserPersistence) Update(user models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -173,7 +161,7 @@ func (u *UserPersistence) Delete(id int) error {
 }
 
 // Insert inserts a new user into the database, and returns the ID of the newly inserted row
-func (u *UserPersistence) Insert(user User) (int, error) {
+func (u *UserPersistence) AddUser(user models.User) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -222,20 +210,38 @@ func (u *UserPersistence) ResetPassword(password string, userID int) error {
 	return nil
 }
 
-// PasswordMatches uses Go's bcrypt package to compare a user supplied password
-// with the hash we have stored for a given user in the database. If the password
-// and hash match, we return true; otherwise, we return false.
-func (u *User) PasswordMatches(plainText string) (bool, error) {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(plainText))
+// AddBillingAddress inserts a new billing address into the database
+func (u *UserPersistence) AddBillingAddress(address models.Address) (int, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	var newID int
+	stmt := `INSERT INTO billing_address (user_id, address, address_2, postal_code, city, country)
+        VALUES ($1, $2, $3, $4, $5, $6) RETURNING id
+    `
+
+	err := u.db.QueryRowContext(ctx, stmt, address.UserID, address.Address, address.Address2, address.PostalCode, address.PostalCode, address.PostalCode).Scan(&newID)
 	if err != nil {
-		switch {
-		case errors.Is(err, bcrypt.ErrMismatchedHashAndPassword):
-			// invalid password
-			return false, nil
-		default:
-			return false, err
-		}
+		return 0, err
 	}
 
-	return true, nil
+	return newID, nil
+}
+
+// GetBillingAddressByUserID returns the billing address for the given user ID
+func (u *UserPersistence) GetBillingAddressByUserID(userID int) (*models.Address, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `SELECT id, address, address_2, postal_code, city, country FROM billing_address WHERE user_id = $1`
+
+	var billingAddress models.Address
+	row := u.db.QueryRowContext(ctx, query, userID)
+
+	err := row.Scan(&billingAddress.ID, &billingAddress.Address, &billingAddress.Address2, &billingAddress.PostalCode, &billingAddress.City, &billingAddress.Country)
+	if err != nil {
+		return nil, err
+	}
+
+	return &billingAddress, nil
 }
