@@ -94,7 +94,6 @@ To run the project, follow these steps:
 3. Run Docker Compose to build and start the project containers:
 
     ```bash
-    Copy code
     docker-compose up --build -d
 
 4. Download the Postman collection from the provided link.
