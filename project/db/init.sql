@@ -69,7 +69,7 @@ CREATE TABLE failed_invoices
 (
     id SERIAL PRIMARY KEY,
     subscription_id INT NOT NULL,
-    invoice_id VARCHAR(25) NOT NULL,
+    invoice_id VARCHAR(50) NOT NULL,
     invoice_date TIMESTAMP NOT NULL,
     email_retry INT NOT NULL,
     FOREIGN KEY (subscription_id) REFERENCES subscriptions(id)
