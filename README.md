@@ -104,3 +104,26 @@ Create a subscription plan.
 Sign up a new user.
 These steps will set up the project environment and allow you to interact with the subscription service using Postman.
 
+## Monitoring the Project
+
+## MailHog
+
+MailHog is a tool for testing email interactions during development. It captures outgoing emails and displays them in a web interface, allowing you to inspect the content, headers, and other details without actually sending emails to real recipients.
+
+To access MailHog:
+
+1. Open your web browser.
+2. Navigate to [http://localhost:8025](http://localhost:8025).
+3. You will be directed to the MailHog web interface, where you can view and manage the captured emails.
+
+## Adminer
+
+Adminer is a lightweight database management tool written in PHP. It provides a user-friendly interface for managing databases, executing queries, and performing other administrative tasks.
+
+To access Adminer:
+
+1. Open your web browser.
+2. Navigate to [http://localhost:5053](http://localhost:5053).
+3. You will be directed to the Adminer login page.
+4. Enter the database credentials (username, password, and database name) to log in.
+5. Once logged in, you can perform various database management tasks using the Adminer interface.
